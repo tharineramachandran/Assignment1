@@ -1,0 +1,187 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <link class="jsbin" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
+    <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
+    <meta charset=utf-8 />
+    <title>JS Bin</title>
+    <!--[if IE]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <style>
+        article, aside, figure, footer, header, hgroup,
+        menu, nav, section {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Upload Image to S3</h1>
+    <div>
+        <div>
+            <p> select an image </p>
+            <input type="file" id="fileUpload" onchange="readURL(this);" />
+
+        </div>
+        <div>
+            <br>
+            <button onclick="s3upload()">Submit</button>
+            <br>
+
+             <h3 id="warning"></h3>
+            <p id="link"></p>
+
+        </div>
+
+    </div>
+    <br>
+
+    <img id="image" />
+    <br>
+
+    <br>
+
+    <p>Upload progress</p>
+    <progress max="100" value="0"</progress>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript">
+        //Bucket Configurations
+        var bucketName = 'task4-csc';
+        var bucketRegion = 'us-east-1';
+        var IdentityPoolId = "us-east-1:b65d5aba-a0c9-47e2-afdd-6b3084169080";
+
+        AWS.config.update({
+            region: bucketRegion,
+            credentials: new AWS.CognitoIdentityCredentials({
+                IdentityPoolId: IdentityPoolId
+            })
+        });
+
+        var s3 = new AWS.S3({
+            apiVersion: '2006-03-01',
+            params: { Bucket: bucketName }
+        });
+    </script>
+
+
+    <script type="text/javascript">
+
+        function readURL(input) {
+             if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#image')
+                        .attr('src', e.target.result)
+                        .width(150)
+                        .height(200);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function s3upload() {
+            document.getElementById("link").innerHTML = "";
+            var files = document.getElementById('fileUpload').files;
+            if (files) {
+                try {
+
+                    var file = files[0];
+                    var fileName = file.name;
+                    var filePath = 'task4-csc/' + fileName;
+                    var fileUrl = 'https://' + bucketRegion + '.amazonaws.com/task4-csc/' + filePath;
+                } catch {
+                    document.getElementById("warning").innerHTML = 'add image!' ;
+
+
+                }
+                s3.upload({
+                    Key: filePath,
+                    Body: file,
+                    ACL: 'public-read'
+                }, function (err, data) {
+                    if (err) {
+                        document.getElementById("warning").innerHTML = 'Error!';
+
+                        } 
+ 
+                        console.log(data.Location);
+                        var pLongUrl = data.Location ;
+                        var apiKey = 'ccc2dd00b5ca21ea9e40ca108af58329439a6383';
+                        var username = 'tharaerqwerqerwq';
+
+                        /*Ajax call*/
+                        $.ajax(
+                            {
+                                url: 'https://api-ssl.bitly.com/v3/shorten?login=' + username + '&access_token=' + apiKey + '&format=json&longUrl=' + encodeURIComponent(pLongUrl),
+
+                                dataType: 'jsonp',
+
+                                success: function (response) {
+                                    if (response.status_code == 500) {
+
+                                        /*500 status code means the link is malformed.*/
+                                        return "Error: Invalid link.";
+
+                                    } else if (response.status_code != 200) {
+
+                                        /*If response is not 200 then an error ocurred. It can be a network issue or bitly is down.*/
+                                        return "Error: Service unavailable.";
+
+                                        /*Uncomment the following line only for debugging purposes*/
+                                        /*console.log('Response: ' + response.status_code + '-' + response.status_txt);*/
+                                    }
+                                    else
+                                        document.getElementById("warning").innerHTML = "upload successful";
+
+                                    var str = "Download image here";
+                                    var result = str.link(response.data.url);
+                                    document.getElementById("link").innerHTML = result;
+
+                                    return response.data.url; /* OK, return the short link */
+                                },
+
+                                contentType: 'application/json'
+                            });
+
+
+                        //var bitlyData = {};
+                        //bitlyData['login'] = "tharaerqwerqerwq";
+                        //bitlyData['apiKey'] = "ccc2dd00b5ca21ea9e40ca108af58329439a6383";
+                        //bitlyData['longUrl'] = data.Location;
+                        //bitlyData['format'] = "json";
+                        //$.ajax({
+                        //    url: 'http://api.bitly.com/v3/shorten?',
+                        //    data: bitlyData,
+                        //    success: function (data) {
+                        //        console.log(JSON.stringify(data));
+                        //    },
+                        //    error: function (e) {
+                        //        alert("err:" + JSON.stringify(e))
+                        //    }
+                        //});     
+
+
+                         
+                }).on('httpUploadProgress', function (progress) {
+                    var uploaded = parseInt((progress.loaded * 100) / progress.total);
+                    $("progress").attr('value', uploaded);
+                });
+
+            } else {
+
+                document.getElementById("warning").innerHTML = 'image not available!';
+            }
+        };
+    </script>
+</body>
+
+
+</html>
