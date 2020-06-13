@@ -1,31 +1,201 @@
-﻿@{
-    ViewBag.Title = "Home Page";
+﻿
+@model Task6.Models.StripeChargeModel
+
+
+
+@{
+    ViewBag.Title = "Stripe Tutorial";
 }
-
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+<meta http-equiv="Access-Control-Allow-Origin" content="*" />
+<meta http-equiv="Access-Control-Allow-Headers" content="Content-Type" />
+<meta http-equiv="Access-Control-Allow-Methods" content="POST" />
+<h2>Stripe Charge Example with Stripe.js</h2>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<link class="jsbin" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
+<script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
+<div>
+    <h4>Stripe Charge Example</h4>
+    <hr />
+    <p id="warning" style="color:red;"></p>
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
-</div>
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+
+<script type="text/javascript">
+
+
+
+
+    $('document').ready(function () {
+        Stripe.setPublishableKey('pk_test_qOc7BjT6S3JesC6i5RlNevq700ptlnoJmt');
+
+
+
+        $('#btnCharge').on('click', function (e) {
+
+
+
+            e.preventDefault();
+            e.stopPropagation();
+            Stripe.card.createToken({
+
+                number: $('#txtCardNumber').val(),
+                cvc: $('#txtCvc').val(),
+                exp_month: $('#txtExpiryMonth').val(),
+                exp_year: $('#txtExpiryYear').val()
+            }, stripeResponseHandler);
+
+
+
+        });
+
+        function stripeResponseHandler(status, response) {
+
+
+
+            var $form = $('#frmCharge');
+            if (response.error) {
+                // Show the errors on the form
+                 document.getElementById("warning").innerHTML = response.error.message;
+
+            } else {
+                // response contains id and card, which contains additional card details
+                var token = response.id;
+                // Insert the token into the form so it gets submitted to the server
+                $('#hdnToken').val(token);
+                // and submit
+
+                var frm = $('#frmCharge');
+                //    $form.get(0).submit();
+                console.log(frm);
+                 $.ajax({
+async: false,
+cache: false,
+type: "POST",
+url: "@(Url.Action("Charge", "Charge"))",
+                     data: frm.serialize(),
+                     success: function (data,response) {
+                          alert(response)
+                     },
+                     error: function ( error) {
+                         alert("check if the card details provided are valid  ")
+                     }
+});
+
+                //var frm = $('#frmCharge');
+                //$.ajax({
+                //    type: "POST",
+                //    url: "/Home/Charge",// where you wanna post
+                //    data: frm,
+                //    processData: false,
+                //    contentType: false,
+                //    error: function (jqXHR, textStatus, errorMessage) {
+                //        console.log(errorMessage); // Optional
+                //    },
+                //    success: function (data) { console.log(data) }
+                //});
+
+
+            }
+        }
+    });
+</script>
+
+@using (Html.BeginForm("Charge", "Charge", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form", id = "frmCharge" }))
+{
+    @Html.AntiForgeryToken()
+    <dl class="dl-horizontal">
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CardNum)
+        </dt>
+        <dd>
+            @Html.TextBoxFor(model => model.CardNum, new { id = "txtCardNumber" })
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Expyear)
+        </dt>
+        <dd>
+            @Html.TextBoxFor(model => model.Expyear, new { id = "txtExpiryYear" })
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ExpMonth)
+        </dt>
+        <dd>
+            @Html.TextBoxFor(model => model.ExpMonth, new { id = "txtExpiryMonth" })
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CVV)
+        </dt>
+        <dd>
+            @Html.TextBoxFor(model => model.CVV, new { id = "txtCvc" })
+        </dd>
+
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd>
+            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @type = "email" } })
+
+        </dd>
+
+
+
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CardHolderName)
+        </dt>
+        <dd>
+            @Html.TextBoxFor(model => model.CardHolderName, new { id = "txtCardHolderName" })
+        </dd>
+
+
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Amount)
+        </dt>
+        <dd>
+            @Html.TextBoxFor(model => model.Amount, new { id = "txtAmount" })
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AddressLine1)
+        </dt>
+        <dd>
+            @Html.TextBoxFor(model => model.AddressLine1, new { id = "txtAddress1" })
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AddressLine2)
+        </dt>
+        <dd>
+            @Html.TextBoxFor(model => model.AddressLine2, new { id = "txtAddress2" })
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AddressCity)
+        </dt>
+        <dd>
+            @Html.TextBoxFor(model => model.AddressCity, new { id = "txtCity" })
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.AddressPostcode)
+        </dt>
+        <dd>
+            @Html.TextBoxFor(model => model.AddressPostcode, new { id = "txtPostcode" })
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AddressCountry)
+        </dt>
+        <dd>
+            @Html.TextBoxFor(model => model.AddressCountry, new { id = "txtCountry" })
+        </dd>
+    </dl>
+    <p>
+        @Html.HiddenFor(model => model.Token, new { id = "hdnToken" })
+        @Html.ActionLink("ProcessPayment", "Charge", null, new { id = "btnCharge" })
+    </p>
+}
