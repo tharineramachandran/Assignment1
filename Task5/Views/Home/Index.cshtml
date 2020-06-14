@@ -4,6 +4,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <link class="jsbin" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
     <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
     <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
@@ -58,7 +60,7 @@
 
         AWS.config.update({
             region: bucketRegion,
-            credentials: new AWS.CognitoIdentityCredentials({
+            credentials: new AWS.CognitoIdentityCredentials({       
                 IdentityPoolId: IdentityPoolId
             })
         });
@@ -71,6 +73,24 @@
 
 
     <script type="text/javascript">
+
+        function url() {
+            $.ajax({
+                url: '/Home/bitly',
+                type: 'POST',
+                dataType: 'json',
+                data: { pLongUrl: 'https://stackoverflow.com/questions/20151556/how-to-get-the-http-post-data-in-c' },
+                success: function (data) {
+                   console.log(JSON.stringify(data));
+                },
+                error: function () {
+                    alert('error');
+                }
+            });
+
+
+        }
+
 
         function readURL(input) {
              if (input.files && input.files[0]) {
@@ -107,66 +127,38 @@
                     Body: file,
                     ACL: 'public-read'
                 }, function (err, data) {
-                    if (err) {
-                        document.getElementById("warning").innerHTML = 'Error!';
+                        if (err) {
+                            document.getElementById("warning").innerHTML = 'Error!';
 
-                        } 
- 
-                        console.log(data.Location);
-                        var pLongUrl = data.Location ;
-                        var apiKey = 'ccc2dd00b5ca21ea9e40ca108af58329439a6383';
-                        var username = 'tharaerqwerqerwq';
+                        }
+                        else {
+                            console.log(data.Location);
 
-                        /*Ajax call*/
-                        $.ajax(
-                            {
-                                url: 'https://api-ssl.bitly.com/v3/shorten?login=' + username + '&access_token=' + apiKey + '&format=json&longUrl=' + encodeURIComponent(pLongUrl),
+                            $.ajax({
+                                url: '/Home/bitly',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: { pLongUrl: data.Location},
+                                success: function (data) {
 
-                                dataType: 'jsonp',
 
-                                success: function (response) {
-                                    if (response.status_code == 500) {
+                                    var str = "Click here to download the image";
+                                    var result = str.link(data);
+                                    document.getElementById("warning").innerHTML = result;
 
-                                        /*500 status code means the link is malformed.*/
-                                        return "Error: Invalid link.";
-
-                                    } else if (response.status_code != 200) {
-
-                                        /*If response is not 200 then an error ocurred. It can be a network issue or bitly is down.*/
-                                        return "Error: Service unavailable.";
-
-                                        /*Uncomment the following line only for debugging purposes*/
-                                        /*console.log('Response: ' + response.status_code + '-' + response.status_txt);*/
-                                    }
-                                    else
-                                        document.getElementById("warning").innerHTML = "upload successful";
-
-                                    var str = "Download image here";
-                                    var result = str.link(response.data.url);
-                                    document.getElementById("link").innerHTML = result;
-
-                                    return response.data.url; /* OK, return the short link */
+                                 
                                 },
-
-                                contentType: 'application/json'
+                                error: function () {
+                                    alert('error');
+                                }
                             });
 
 
-                        //var bitlyData = {};
-                        //bitlyData['login'] = "tharaerqwerqerwq";
-                        //bitlyData['apiKey'] = "ccc2dd00b5ca21ea9e40ca108af58329439a6383";
-                        //bitlyData['longUrl'] = data.Location;
-                        //bitlyData['format'] = "json";
-                        //$.ajax({
-                        //    url: 'http://api.bitly.com/v3/shorten?',
-                        //    data: bitlyData,
-                        //    success: function (data) {
-                        //        console.log(JSON.stringify(data));
-                        //    },
-                        //    error: function (e) {
-                        //        alert("err:" + JSON.stringify(e))
-                        //    }
-                        //});     
+
+
+                        }
+  
+                      
 
 
                          
