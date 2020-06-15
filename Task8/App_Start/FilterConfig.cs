@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Mvc;
 
-namespace Task8
+namespace task8
 {
     public class FilterConfig
     {
