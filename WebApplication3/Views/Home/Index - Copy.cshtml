@@ -1,0 +1,125 @@
+﻿
+<h1>Image recognation </h1>
+<div>
+    <div>
+        <p> select an image </p>
+        <input type="file" id="fileUpload" onchange="readURL(this);" />
+
+    </div>
+    <div>
+        <br>
+        <button onclick="s3upload()">Submit</button>
+        <br>
+
+        <h3 id="warning"></h3>
+        <p id="link"></p>
+
+    </div>
+
+</div>
+<br>
+
+<img id="image" />
+<br>
+
+<br>
+
+<script type="text/javascript" src="https://sdk.clarifai.com/js/clarifai-latest.js"></script>
+
+
+<script type="text/javascript">
+
+
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#image')
+                    .attr('src', e.target.result)
+                    .width(150)
+                    .height(200);
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function s3upload() {
+            
+
+
+
+
+
+        var image_file = $('#fileUpload').get(0).files[0];
+
+        var formData = new FormData();
+        formData.append("image", image_file);
+
+
+
+        $.ajax({
+            url: '/Home/Clarifai',
+            type: 'POST',
+            data: formData, processData: false, contentType: false,
+            success: function (data) {
+
+
+                var result = "success";
+                document.getElementById("warning").innerHTML = result;
+
+
+            },
+            error: function () {
+                var result = "error";
+                document.getElementById("warning").innerHTML = result;
+            }
+        });
+
+
+
+        //document.getElementById("link").innerHTML = "";
+        //var files = document.getElementById('fileUpload').files;
+        //if (files) {
+
+
+
+        //    var image_file = $('#fileUpload').get(0).files[0];
+
+        //    var formData = new FormData();
+        //    formData.append("image", image_file);
+
+        //        console.log(files[0]);
+
+
+        //                $.ajax({
+        //                    url: '/Home/Clarifai',
+        //                    type: 'POST',
+        //                    data: formData,
+        //                    success: function (data) {
+
+
+        //                        var result = "success";
+        //                         document.getElementById("warning").innerHTML = result;
+
+
+        //                    },
+        //                    error: function () {
+        //                        var result = "error";
+        //                        document.getElementById("warning").innerHTML = result;
+        //                    }
+        //                });
+
+
+
+
+
+
+        //} else {
+
+        //    document.getElementById("warning").innerHTML = 'image not available!';
+        //}
+    };
+</script> 
