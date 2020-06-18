@@ -21,6 +21,7 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Stripe", "Create", "Cart")</li>
+                    <li>@Html.ActionLink("Manage Billing", "ManageBilling", "Billing")</li>
                 </ul>
             </div>
         </div>
@@ -37,5 +38,6 @@
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
     @RenderSection("stripe", required: false)
+    @RenderSection("managebilling", required: false)
 </body>
 </html>
