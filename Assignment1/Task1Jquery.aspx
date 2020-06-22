@@ -1,99 +1,31 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Task1Jquery.aspx.cs" Inherits="Assignment1.WebForm1" %>
 
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
 <!DOCTYPE html>
 <html>
 <head>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            const d = new Date();
-
-            var currentMonth = ('0' + (d.getMonth() + 1)).slice(-2)
-
-            var date = d.getFullYear() + "-" + currentMonth + "-" + d.getDate();
-
-            const url = 'https://api.data.gov.sg/v1/environment/24-hour-weather-forecast?date_time=' + date + 'T15%3A28%3A01&date=' + date;
-            $.get(url, function (data, status) {
-                console.log(data);
-                if (data) {
-
-                    data1 = data.items[0].general;    // 100
-                    forecast = data1.forecast;
-                    console.log(forecast);
-                    relative_humidity = data1.relative_humidity;
-                    temperature = data1.temperature;
-                    period = data.items[0].periods;
-                    console.log(period);
-
-                    document.getElementById("forecast").innerHTML = "Forcast  for today " + date +" is " + data1.forecast;
-
-
-                    var table1 = document.getElementById("table");
-                    for (i = 0; i < period.length; i++) {
-
-
-                        var row = table1.insertRow(1);
-                        var cell5 = row.insertCell(0);
-                        var cell6 = row.insertCell(1);
-                        var cell0 = row.insertCell(2);
-                        var cell1 = row.insertCell(3);
-                        var cell2 = row.insertCell(4);
-                        var cell3 = row.insertCell(5);
-                        var cell4 = row.insertCell(6);
-
-                         
-
-                        var start = new Date(period[i].time.start);
-
-
-                        var end = new Date(period[i].time.end);
-
-                        cell5.innerHTML = start.getHours().toString() + " : 00";
-                        cell6.innerHTML = end.getHours().toString() + " : 00";
-
-
-                        cell0.innerHTML = period[i].regions.east;
-                        cell1.innerHTML = period[i].regions.west;
-                        cell2.innerHTML = period[i].regions.north;
-
-                        cell3.innerHTML = period[i].regions.south;
-                        cell4.innerHTML = period[i].regions.central;
-
-
-                       
-
-                    }
 
 
 
 
-                    function addtable(dic, type) {
-                        var table = document.getElementById("myTable");
-                        var row = table.insertRow(1);
-                        var cell3 = row.insertCell(0);
-                        var cell1 = row.insertCell(1);
-                        var cell2 = row.insertCell(2);
 
-                        cell3.innerHTML = type;
-                        high = dic['high'];
-                        low = dic['low'];
-                        cell1.innerHTML = high;
-                        cell2.innerHTML = low;
-                    }
-
-
-                    addtable(relative_humidity, "relative humidity")
-
-                    addtable(temperature, "temperature")
-                }
-            });
-
-        });
-    </script>
 </head>
+
+
 <body>
+     <div id ="prograss">
+<h3>Loading </h3>
+
+<div id="progress">
+  <div id="bar">0%</div>
+</div>      
+         </div>
+    
+    <div id ="container">
     <h1 id="forecast"></h1>
 
      <table id="myTable">
@@ -122,6 +54,7 @@
             </tr>
         </thead>
     </table>
+        </div>
            <style>
 #myTable,#table {
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
@@ -151,6 +84,176 @@
   background-color: #4CAF50;
   color: white;
 }
+#container {
+              display : none;
+                   
+               
+               } 
+
+#progress {
+  width: 100%;
+  background-color: #ddd;
+}
+
+#bar {
+  width: 10%;
+  height: 30px;
+  background-color: #4CAF50;
+  text-align: center;
+  line-height: 30px;
+  color: white;
+} 
 </style>
+
+
+
+
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+
+    const d = new Date();
+
+    var currentMonth = ('0' + (d.getMonth() + 1)).slice(-2)
+
+    var date = d.getFullYear() + "-" + currentMonth + "-" + d.getDate();
+
+    const url = 'https://api.data.gov.sg/v1/environment/24-hour-weather-forecast?date_time=' + date + 'T15%3A28%3A01&date=' + date; 
+
+    $.ajax({
+        xhr: function () {
+
+            var i = 0;
+
+            var xhr = new window.XMLHttpRequest();
+        
+            //Download progress
+            xhr.addEventListener("progress", function (evt) {
+                if (evt.lengthComputable) {
+                    var percentComplete = evt.loaded / evt.total;
+                    //Do something with download progress
+                    console.log(percentComplete);
+
+                    if (i == 0) {
+                        i = 1;
+                        var elem = document.getElementById("bar");
+                        var width = percentComplete ;
+                        var id = setInterval(frame, 10);
+                        function frame() {
+                            if (width >= 100) {
+                                clearInterval(id);
+                                i = 0;
+                                var prograss = document.getElementById("prograss");
+                                prograss.style.display = 'none';
+                                console.log("asdf");
+                                var element = document.getElementById("container");
+                                element.style.display = 'inline';  
+
+                                 
+
+                            } else {
+                                width++;
+                                elem.style.width = width + "%";
+                                elem.innerHTML = width + "%";
+                            }
+                        }
+                    }
+
+
+                }
+            }, false);
+            return xhr;
+        },
+        type: 'GET',
+        url: url,
+        data: {},
+        success: function (data) {
+            console.log("fASAf");
+
+
+            data1 = data.items[0].general;    // 100
+            forecast = data1.forecast;
+            console.log(forecast);
+            relative_humidity = data1.relative_humidity;
+            temperature = data1.temperature;
+            period = data.items[0].periods;
+            console.log(period);
+
+            document.getElementById("forecast").innerHTML = "Forcast  for today " + date + " is " + data1.forecast;
+
+
+            var table1 = document.getElementById("table");
+            for (i = 0; i < period.length; i++) {
+
+
+                var row = table1.insertRow(1);
+                var cell5 = row.insertCell(0);
+                var cell6 = row.insertCell(1);
+                var cell0 = row.insertCell(2);
+                var cell1 = row.insertCell(3);
+                var cell2 = row.insertCell(4);
+                var cell3 = row.insertCell(5);
+                var cell4 = row.insertCell(6);
+
+
+
+                var start = new Date(period[i].time.start);
+
+
+                var end = new Date(period[i].time.end);
+
+                cell5.innerHTML = start.getHours().toString() + " : 00";
+                cell6.innerHTML = end.getHours().toString() + " : 00";
+
+
+                cell0.innerHTML = period[i].regions.east;
+                cell1.innerHTML = period[i].regions.west;
+                cell2.innerHTML = period[i].regions.north;
+
+                cell3.innerHTML = period[i].regions.south;
+                cell4.innerHTML = period[i].regions.central;
+
+
+
+
+            }
+
+
+
+
+            function addtable(dic, type) {
+                var table = document.getElementById("myTable");
+                var row = table.insertRow(1);
+                var cell3 = row.insertCell(0);
+                var cell1 = row.insertCell(1);
+                var cell2 = row.insertCell(2);
+
+                cell3.innerHTML = type;
+                high = dic['high'];
+                low = dic['low'];
+                cell1.innerHTML = high;
+                cell2.innerHTML = low;
+            }
+
+
+            addtable(relative_humidity, "relative humidity")
+
+            addtable(temperature, "temperature")
+
+ 
+        }
+    });</script>
+
+

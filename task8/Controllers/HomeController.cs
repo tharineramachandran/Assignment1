@@ -12,12 +12,5 @@ namespace task8.Controllers
         {
             return View();
         }
-        public ActionResult Clarifai()
-        {
-            var image = Request.Form["image"];
-            return Json("asdf");
-
-        }
-
     }
 }

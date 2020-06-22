@@ -11,8 +11,8 @@ namespace Task2.Models
         IEnumerable<Product> GetAll();
         Product Get(int id);
         Product Add(Product item);
-        void Remove(int id);
-        bool Update(Product item);
+        bool Remove(int id);
+        Product Update(Product item);
     }
 }
 

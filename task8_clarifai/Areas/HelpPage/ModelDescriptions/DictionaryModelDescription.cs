@@ -1,0 +1,6 @@
+namespace task8_clarifai.Areas.HelpPage.ModelDescriptions
+{
+    public class DictionaryModelDescription : KeyValuePairModelDescription
+    {
+    }
+}

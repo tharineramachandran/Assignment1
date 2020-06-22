@@ -1,7 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using Amazon;
+using Amazon.S3;
+using Amazon.S3.Transfer;
+using Microsoft.Ajax.Utilities;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -9,7 +16,7 @@ using System.Net.Http;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
-
+ 
 namespace Task5.Controllers
 {
     public class HomeController : Controller
@@ -34,40 +41,86 @@ namespace Task5.Controllers
         }
 
 
-         
+
         public async System.Threading.Tasks.Task<ActionResult> bitly()
         {
-
-            var payload = new
+          var time  = DateTime.Now;
+            String timestamp = time.ToString("dd_MM_yyyy_hh_mm_ss"); 
+            var file  = Request.Files["image"];
+            if (file!=null)
             {
-                destination = "https://www.youtube.com/channel/UCHK4HD0ltu1-I212icLPt3g",
-                domain = new
+                string path = Path.Combine(Server.MapPath("~/"),
+                                          Path.GetFileName(file.FileName));
+                file.SaveAs(path);
+
+
+                bool value = amazon(path, timestamp);
+                var image = Image.FromFile(path);
+
+                image.Dispose();
+
+                if (value)
                 {
-                    fullName = "rebrand.ly",
-                    slashtag = "task8_45239ewrtwetr"
+                    try
+                    {
+                        String photolink = "https://task4-csc.s3.amazonaws.com/" + timestamp;
+                        String Filename = timestamp;
+
+                        int index = Filename.IndexOf(".");
+                        if (index > 0)
+                            Filename = Filename.Substring(0, index);
+                        String slashtagstr = String.Format("ST0280_{0}_ISO8601_{1}_", time.ToString("dd_MM_yyyy"), Filename);
+
+                        var payload = new
+                        {
+                            destination = photolink,
+                            domain = new
+                            {
+                                fullName = "rebrand.ly"
+
+                            }
+                            ,
+                            slashtag = slashtagstr
+                            //, title = "Rebrandly YouTube channel"
+                        };
+
+                        using (var httpClient = new HttpClient { BaseAddress = new Uri("https://api.rebrandly.com") })
+                        {
+                            httpClient.DefaultRequestHeaders.Add("apikey", "11205a30dee141198102aece40e951c3");
+                            httpClient.DefaultRequestHeaders.Add("workspace", "876fc66de4e14985a049ef8dc836ced2");
+
+                            var body = new StringContent(
+                                JsonConvert.SerializeObject(payload), UnicodeEncoding.UTF8, "application/json");
+
+                            using (var response = await httpClient.PostAsync("/v1/links", body))
+                            {
+                                response.EnsureSuccessStatusCode();
+
+                                var link = JsonConvert.DeserializeObject<dynamic>(
+                                    await response.Content.ReadAsStringAsync());
+
+                                string strlink = $"https://{link.shortUrl}";
+                                Response.StatusCode = 200;
+                                return Json(strlink);
+                            }
+                        }
+                    }
+                    catch (Exception e) { 
+                    
+
+                        Response.StatusCode = 400;
+                        return Json("An Error Occured"); 
+                    }
                 }
-                //, slashtag = "A_NEW_SLASHTAG"
-                //, title = "Rebrandly YouTube channel"
-            };
-
-            using (var httpClient = new HttpClient { BaseAddress = new Uri("https://api.rebrandly.com") })
-            {
-                httpClient.DefaultRequestHeaders.Add("apikey", "dcabacac92074eeea9be758a1cfc88aa");
-                httpClient.DefaultRequestHeaders.Add("workspace", "dced5565b5e04a6baab34c7ffe0b4e82");
-
-                var body = new StringContent(
-                    JsonConvert.SerializeObject(payload), UnicodeEncoding.UTF8, "application/json");
-
-                using (var response = await httpClient.PostAsync("/v1/links", body))
+                else
                 {
-                    response.EnsureSuccessStatusCode();
+                    Response.StatusCode = 400;
+                    return Json("Could not save to amazon S3");
 
-                    var link = JsonConvert.DeserializeObject<dynamic>(
-                        await response.Content.ReadAsStringAsync());
-
-                    Console.WriteLine($"Long URL was {payload.destination}, short URL is {link.shortUrl}");
                 }
             }
+            Response.StatusCode = 400;
+            return Json("Add an Image");
             //    try
             //    {
             //        String value = Request.Form["pLongUrl"];
@@ -144,10 +197,79 @@ namespace Task5.Controllers
             //        return Json("Error occured");
 
             //    }
-            return Json("sfadfa");
+
         }
+         
+        public bool amazon(String filePath , String timestamp)
+        {
+            var bucketName = "task4-csc"; 
+   
+        // Specify your bucket region (an example region is shown).
+         RegionEndpoint bucketRegion = RegionEndpoint.USEast1;
+         IAmazonS3 s3Client;
 
+         
+            s3Client = new AmazonS3Client("ASIATS2W2CQOXOXZXJE4", "NQ7f/a/VqM8JXzuE2ERew+tFZNW06l4cYpAVgR0Z", "FwoGZXIvYXdzENP//////////wEaDFKnn549zfzz2Guo6iLOAcfGFCv1pig6ZGgySpsPqXdqqm8htRwjRRdSTgI7BbF3SGKbEKfYrp8r/dnGnw+aYjCrldnT/O4AoyGefYBHPls9FkdRewLQqBGXjwdqLjPu65gojFQ9q1nAThP2sk7Z5dGyVNO3QztHZAshcDPJVqs8RLK3LcJZqvNxgcwtMPMRhV3TE76xGoIHEsqKEKVbnVuDAXrMnb4R0cwglaJIpL4j/SyLQlCuzlNKhM2EQUvjd01+YTBLKAeWB6cxh6mUswP0o9YatDnN6hyq0ldtKMG2vvcFMi32Ii2DALNTsI5582s+zeQ9mgXTMGhtWI2e+e5k9kJ85lfpLqwIE4p+VSe3mnk=",   bucketRegion);
+         
 
+         
+            try
+            {
+                var fileTransferUtility =
+                    new TransferUtility(s3Client);
+
+                // Option 1. Upload a file. The file name is used as the object key name.
+                  fileTransferUtility.UploadAsync(filePath, bucketName, timestamp);
+                Console.WriteLine("Upload 1 completed");
+
+                //// Option 2. Specify object key name explicitly.
+                //await fileTransferUtility.UploadAsync(filePath, bucketName, keyName);
+                //Console.WriteLine("Upload 2 completed");
+
+                //// Option 3. Upload data from a type of System.IO.Stream.
+                //using (var fileToUpload =
+                //    new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                //{
+                //    await fileTransferUtility.UploadAsync(fileToUpload,
+                //                               bucketName, keyName);
+                //}
+                //Console.WriteLine("Upload 3 completed");
+
+                //// Option 4. Specify advanced settings.
+                //var fileTransferUtilityRequest = new TransferUtilityUploadRequest
+                //{
+                //    BucketName = bucketName,
+                //    FilePath = filePath,
+                //    StorageClass = S3StorageClass.StandardInfrequentAccess,
+                //    PartSize = 6291456, // 6 MB.
+                //    Key = keyName,
+                //    CannedACL = S3CannedACL.PublicRead
+                //};
+                //fileTransferUtilityRequest.Metadata.Add("param1", "Value1");
+                //fileTransferUtilityRequest.Metadata.Add("param2", "Value2");
+
+                //await fileTransferUtility.UploadAsync(fileTransferUtilityRequest);
+                //Console.WriteLine("Upload 4 completed");
+
+                return true; 
+            }
+            catch (AmazonS3Exception e)
+            {
+                Console.WriteLine("Error encountered on server. Message:'{0}' when writing an object", e.Message);
+                return false;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
+                return false;
+            }
+             
+        }
+    }
 
     }
-}
+  
+
+             
+         
+    

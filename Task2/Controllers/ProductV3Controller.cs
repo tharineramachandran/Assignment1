@@ -5,7 +5,9 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Description;
 using System.Web.Mvc;
+using Task2.Controllers.Filters;
 using Task2.Models;
 using HttpDeleteAttribute = System.Web.Http.HttpDeleteAttribute;
 using HttpGetAttribute = System.Web.Http.HttpGetAttribute;
@@ -19,7 +21,15 @@ namespace Task2.Controllers
     {
         static readonly IProductRepository repository = new ProductRepository();
 
+        public static class WebApiConfig
+        {
+            public static void Register(HttpConfiguration config)
+            {
+                config.Filters.Add(new ValidateModelAttribute());
 
+                // ...
+            }
+        }
         //Version 3
         //[Authorize]
         [System.Web.Http.HttpGet]
@@ -49,7 +59,7 @@ namespace Task2.Controllers
             Product item = repository.Get(id);
             if (item == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
             return item;
         }
@@ -65,15 +75,12 @@ namespace Task2.Controllers
             return repository.GetAll().Where(
                 p => string.Equals(p.Category, category, StringComparison.OrdinalIgnoreCase));
         }
-
-
-        //Response code: By default, the Web API framework sets the response status code to 200 (OK). 
-        //But according to the HTTP/1.1 protocol, when a POST request results in the creation of a resource, the server should reply with status 201 (Created).
-        //Location: When the server creates a resource, it should include the URI of the new resource in the Location header of the response.
+         
 
         [HttpPost]
         [Route("api/v3/products")]
-        public HttpResponseMessage PostProduct(Product item)
+        [ValidateModel] 
+        public HttpResponseMessage PostProduct(  Product item)   
         {
             if (ModelState.IsValid)
             {
@@ -100,20 +107,42 @@ namespace Task2.Controllers
 
         [HttpPut]
         [Route("api/v3/products/{id:int}")]
-        public void PutProduct(int id, Product product)
+        public HttpResponseMessage PutProduct(int id, Product product)
         {
             product.Id = id;
-            if (!repository.Update(product))
+            if (!ModelState.IsValid)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
             }
-        }
+            repository.Update(product);
+
+            var response = Request.CreateResponse<Product>(HttpStatusCode.OK, product);
+
+            string uri = Url.Link("getProductByIdv3", new { id = product.Id });
+            response.Headers.Location = new Uri(uri);
+            return response; ;
+        }   
 
         [HttpDelete]
         [Route("api/v3/products/{id:int}")]
-        public void DeleteProduct(int id)
+        public HttpResponseMessage DeleteProduct(int id)
         {
-            repository.Remove(id);
+            try
+            {
+                repository.Remove(id);
+
+                var response = Request.CreateResponse<String>(HttpStatusCode.OK, "Delete Successful");
+
+                string uri = Url.Link("getProductByIdv3", new { id = id });
+                response.Headers.Location = new Uri(uri);
+                return response; ;
+            }
+            catch {
+
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Delete Unsuccessful");
+            }
+
         }
     }
 }

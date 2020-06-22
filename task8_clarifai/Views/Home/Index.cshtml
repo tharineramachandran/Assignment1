@@ -1,0 +1,201 @@
+﻿@{ ViewBag.Title = "Home Page"; }
+<!DOCTYPE html>
+<html>
+<head>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <link class="jsbin" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
+    <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
+    <meta charset=utf-8 />
+    <title>JS Bin</title>
+    <!--[if IE]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <style>
+        article, aside, figure, footer, header, hgroup,
+        menu, nav, section {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Receipt Recognition  </h1>
+    <div>
+        <div>
+            <h3> select an image </h3>
+            <input type="file" id="fileUpload" onchange="readURL(this);" />
+
+        </div>
+        <div>
+            <br>
+            <button onclick="s3upload()">Submit</button>
+            <br>
+
+            <h3 id="warning"></h3>
+            <p id="link"></p>
+
+        </div>
+
+    </div>
+    <br>
+
+    <img id="image" />
+    <br>
+
+    <br>
+
+
+
+
+
+
+    <div id="container">
+        <p>Prograss</p>
+
+        <div id="progress">
+            <div id="bar">0%</div>
+        </div>
+    </div>
+
+    <style>
+
+
+
+        h1 {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+        }
+
+
+        #progress {
+            width: 100%;
+            background-color: #ddd;
+        }
+
+        #bar {
+            width: 0%;
+            height: 30px;
+            background-color: #4CAF50;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+        }
+    </style>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+
+        function s3upload() {
+            document.getElementById("warning").innerHTML = "";
+
+             
+            var container = document.getElementById("container");
+            container.style.display = 'block';
+
+            var elem = document.getElementById("bar");
+            elem.style.width = 10 + "%";
+            elem.innerHTML = 10 + "%";
+
+
+            var formData = new FormData();
+
+            var fileSelect = document.getElementById("fileUpload");
+            if (fileSelect.files && fileSelect.files.length == 1) {
+                var file = fileSelect.files[0]
+                formData.set("image", file, file.name);
+            }
+
+
+
+
+            $.ajax({
+                xhr: function () {
+
+                    var i = 0;
+
+                    var xhr = new window.XMLHttpRequest();
+
+                    //Download progress
+                    xhr.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            //Do something with download progress
+                            console.log(percentComplete);
+
+                            if (i == 0) {
+                                i = 1;
+                                var elem = document.getElementById("bar");
+                                var width = percentComplete;
+                                var id = setInterval(frame, 10);
+                                function frame() {
+                                    if (width >= 100) {
+                                        clearInterval(id);
+                                        i = 0;
+                                        var prograss = document.getElementById("prograss");
+                                        prograss.style.display = 'none';
+                                        console.log("asdf");
+                                        var element = document.getElementById("container");
+                                        element.style.display = 'inline';
+
+
+
+                                    } else {
+                                        width++;
+
+                                        elem.style.width = width + "%";
+                                        elem.innerHTML = width + "%";
+                                    }
+                                }
+                            }
+
+
+                        }
+                    }, false);
+                    return xhr;
+                },
+                type: 'POST',
+                url: '/Home/Clarifai',
+                data: formData,
+
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    var str = data.toString(); 
+                    document.getElementById("warning").innerHTML = str;
+
+
+                },
+                error: function (data) {
+                    console.log(data);
+                    var str = data.responseJSON.toString();
+                    document.getElementById("warning").innerHTML = str;
+                }
+
+
+
+
+
+            });
+        };
+
+
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#image')
+                        .attr('src', e.target.result)
+                        .width(150)
+                        .height(200);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+</body>
+
+
+</html>

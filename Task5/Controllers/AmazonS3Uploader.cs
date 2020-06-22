@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web; 
 using Amazon.S3;
 using Amazon.S3.Model;
+using PutObjectRequest = Amazon.S3.Model.PutObjectRequest;
 
 namespace Task5.Controllers
 {
@@ -19,7 +20,7 @@ namespace Task5.Controllers
 
             try
             {
-                PutObjectRequest putRequest = new PutObjectRequest
+                PutObjectRequest putRequest = new  PutObjectRequest
                 {
                     BucketName = bucketName,
                     Key = keyName,

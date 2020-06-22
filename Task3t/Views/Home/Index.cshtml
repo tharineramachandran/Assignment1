@@ -39,12 +39,11 @@
                 <input class="form-control" type="password" data-bind="value: registerPassword2" />
             </div>
             <div class="form-group">
-                <button class="g-recaptcha btn btn-default " data-sitekey="6Lfhj_4UAAAAAHfji34mkMfkkeFOgH3r0HGYCWKm"
-                        data-callback='onSubmit'
-                        onclick='checkRecaptcha()'>
-                    Register
-                </button>
-             </div>
+                <button type="submit" class="btn btn-default">Register</button>
+
+                <button style="display:none" class="g-recaptcha" data-sitekey="6Lfhj_4UAAAAAHfji34mkMfkkeFOgH3r0HGYCWKm" data-callback='onSubmit'> </button>
+  
+            </div>
         </form>
     </div>
 
@@ -69,21 +68,9 @@
 
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <script src='https://www.google.com/recaptcha/api.js' async defer></script>
-
- 
 <script>
-    function checkRecaptcha() {
-        var response = grecaptcha.getResponse();
-        if (response.length == 0) {
-            //reCaptcha not verified
-            alert("Invaild Recapcha");
-        }
-        else {
-            //reCaptch verified
-            //alert("pass");
-            document.getElementById("form_id").submit();// Form submission
-
-        }
+    function onSubmit(token) {
+        document.getElementById("form_id").submit();
     }
-     
 </script>
+  

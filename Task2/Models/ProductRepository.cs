@@ -42,14 +42,9 @@ namespace Task2.Models
             products.Add(item);
             return item;
         }
+         
 
-        public bool Remove(int id)
-        {
-            products.RemoveAll(p => p.Id == id);
-            return  true;
-        }
-
-        public bool Update(Product item)
+        public Product Update(Product item)
         {
             if (item == null)
             {
@@ -58,36 +53,19 @@ namespace Task2.Models
             int index = products.FindIndex(p => p.Id == item.Id);
             if (index == -1)
             {
-                return false;
+                throw new ArgumentNullException("item");
             }
             products.RemoveAt(index);
             products.Add(item);
+            return item;
+        }
+
+     
+        public bool Remove(int id)
+        {
+            products.RemoveAll(p => p.Id == id);
             return true;
-        }
 
-        IEnumerable<Product> IProductRepository.GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        Product IProductRepository.Get(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        Product IProductRepository.Add(Product item)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IProductRepository.Remove(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        bool IProductRepository.Update(Product item)
-        {
-            throw new NotImplementedException();
         }
     }
 
