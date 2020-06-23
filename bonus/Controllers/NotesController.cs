@@ -31,7 +31,7 @@ namespace bonus.Controllers
 
 
                 var result = await firebaseClient
-                    .Child("Notes")
+                    .Child("Notes/")
                     .Child(title)
                     .PostAsync(name);
 
