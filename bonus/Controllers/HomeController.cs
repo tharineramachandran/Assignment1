@@ -78,7 +78,7 @@ namespace bonus.Controllers
         public ActionResult Addmood()
         {
 
-
+            
             try
             {
                 var file = Request.Files["image"];

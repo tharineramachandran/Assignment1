@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bonus", "bonus\bonus.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bonus2_New", "bonus2_New\bonus2_New.csproj", "{A0B4CEB1-CCB7-4D35-AF8A-18E3DCA1A9C9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASPCore", "ASPCore\ASPCore.csproj", "{AE0AA6C9-1E95-4DDF-89AB-0A312E72F850}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{A0B4CEB1-CCB7-4D35-AF8A-18E3DCA1A9C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0B4CEB1-CCB7-4D35-AF8A-18E3DCA1A9C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0B4CEB1-CCB7-4D35-AF8A-18E3DCA1A9C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE0AA6C9-1E95-4DDF-89AB-0A312E72F850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE0AA6C9-1E95-4DDF-89AB-0A312E72F850}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE0AA6C9-1E95-4DDF-89AB-0A312E72F850}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE0AA6C9-1E95-4DDF-89AB-0A312E72F850}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
