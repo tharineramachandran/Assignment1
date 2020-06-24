@@ -14,13 +14,9 @@ namespace Task6_ANDRE.Controllers
 {
     public class CartController : Controller
     {
-        IFirebaseConfig config = new FirebaseConfig
-        {
-            AuthSecret = "WlzsaHKFjCMdBFa1lEvOr36PR2oFvEZDEPFPCJkG",
-            BasePath = "https://refundcsc.firebaseio.com/"
-        };
+        
 
-        FirebaseClient client;
+        
 
         // GET: Cart/Create
         public ActionResult Create()
@@ -72,9 +68,9 @@ namespace Task6_ANDRE.Controllers
                 
 
                 var model = new ChargeViewModel();
-                model.customerName = Convert.ToString(charge.Schedule);
+                model.customerName = Convert.ToString(charge.Customer);
                 model.PriceId = string.Format("{0:#.00}", Convert.ToDecimal(charge.Plan.Amount) / 100);
-                AddSubscription(model);
+                
 
                 return View("OrderStatus", model);
             }
@@ -82,14 +78,6 @@ namespace Task6_ANDRE.Controllers
             {
                 return View();
             }
-        }
-
-        private void AddSubscription(ChargeViewModel chargeViewModel)
-        {
-            client = new FireSharp.FirebaseClient(config);
-            var data = chargeViewModel;
-            PushResponse response = client.Push("Subscription/", data);
-            SetResponse setResponseName = client.Set("Subscription/" + data.PriceId, data);
         }
     }
 }
