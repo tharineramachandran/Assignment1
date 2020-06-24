@@ -25,8 +25,8 @@ namespace Task6_ANDRE.Controllers
 
                 var options = new SessionCreateOptions
                 {
-                    Customer = "cus_HTGx14CJMuqffh",
-                    ReturnUrl = "https://billing.stripe.com/session/EgajgpSHIoFrBLrUa43AUUUUhORGLA5U",
+                    Customer = "cus_HWcnIFFtqiH3TB",
+                    ReturnUrl = "https://billing.stripe.com/session/{SESSION_SECRET}",
                 };
                 var service = new SessionService();
                 service.Create(options);

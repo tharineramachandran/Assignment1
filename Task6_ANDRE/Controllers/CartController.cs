@@ -25,6 +25,9 @@ namespace Task6_ANDRE.Controllers
             {
                 StripeConfiguration.ApiKey = "sk_test_51GtwelDUISIWU8NfIfToFjnvtQ3h4paJJ8JtyyXoivVWYrBZJlFqT3hQolgzBJcLe2VeoiugMfgx3LmZuKeNCrkh004UHd1BPs";
 
+                var eventService = new EventService();
+                //eventService.Get();
+
                 // `source` is obtained with Stripe.js; see https://stripe.com/docs/payments/accept-a-payment-charges#web-create-token
 
                 var customerOptions = new CustomerCreateOptions
