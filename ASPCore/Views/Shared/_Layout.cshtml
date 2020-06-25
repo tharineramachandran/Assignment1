@@ -20,6 +20,7 @@
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Stripe", "Create", "Cart")</li>
                     <li>@Html.ActionLink("Manage Billing", "ManageBilling", "Billing")</li>
+                    <li>@Html.ActionLink("Refund", "Refund")</li>
                 </ul>
             </div>
         </div>
@@ -35,5 +36,6 @@
     @RenderSection("scripts", required: false)
     @RenderSection("stripe", required: false)
     @RenderSection("managebilling", required: false)
+    @RenderSection("refund", required: false)
 </body>
 </html>

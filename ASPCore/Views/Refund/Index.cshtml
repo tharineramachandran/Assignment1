@@ -1,0 +1,57 @@
+﻿
+@{
+    ViewData["Title"] = "Refund";
+    Refund refund = ViewData.Model;
+}
+
+<style media="screen">
+    body {
+        padding: 100px
+    }
+</style>
+
+
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script>
+    $.ajax({
+        url: 'Refund/RefundTable',
+        type: 'GET',
+        
+        success: function (result) {
+            for (var i = 0; i < result.length; i++) {
+                tr = $('<tr/>');
+                tr.append("<td>" + result[i].subscriptionName + "</td>");
+                tr.append("<td>" + result[i].refundAmount + "</td>");
+                tr.append("<input type=" + '"submit" ' + "value=" + '"Refund this amount"' + ">");
+                $('table').append(tr);
+            }
+
+            console.log(result);
+        }
+    })
+</script>
+
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+
+<div class="container">
+    <div class="row">
+        <h2>Refund</h2>
+
+        <form action="/Refund/RefundTable/" method="post">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Customer ID</th>
+                        <th>Refund</th>
+                        <th> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>

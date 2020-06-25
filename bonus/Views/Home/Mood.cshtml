@@ -4,7 +4,29 @@
 }
 
 <h2>Mood</h2>
- 
+
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script>
+    $.ajax({
+        url: 'Addmood',
+        type: 'GET',
+
+        success: function (result) {
+
+            console.log(result);
+            for (var i = 0; i < result.length; i++) {
+                tr = $('<tr/>');
+                tr.append("<td>" + result[i].mood + "</td>");
+                tr.append("<td>" + result[i].timestamp + "</td>");
+                tr.append("<input type=" + '"submit" ' + "value=" + '"Delete"' + ">");
+                $('table').append(tr);
+            }
+
+            console.log(result);
+        }
+    })
+</script>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -27,7 +49,7 @@
 </head>
 <body>
 
-    <h1>upload your image to add to mood tracker </h1>
+    <h1>Upload your image to mood tracker </h1>
     <div>
         <div>
             <h3> select an image </h3>
@@ -58,12 +80,25 @@
 
 
     <div id="container">
-        <p>Prograss</p>
+        <p>Progress</p>
 
         <div id="progress">
             <div id="bar">0%</div>
         </div>
     </div>
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Mood</th>
+                <th>Timestamp</th>
+                <th> </th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 
     <style>
 
@@ -88,119 +123,119 @@
             color: white;
         }
     </style>
-     
+
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script>
 
         function upload() {
             document.getElementById("warning").innerHTML = "";
-                var elem = document.getElementById("bar");
-                elem.style.width = 10 + "%";
-                elem.innerHTML = 10 + "%";
-                var container = document.getElementById("container");
-                container.style.display = 'block';
-                var elem = document.getElementById("bar");
-                elem.style.width = 10 + "%";
-                elem.innerHTML = 10 + "%";
+            var elem = document.getElementById("bar");
+            elem.style.width = 10 + "%";
+            elem.innerHTML = 10 + "%";
+            var container = document.getElementById("container");
+            container.style.display = 'block';
+            var elem = document.getElementById("bar");
+            elem.style.width = 10 + "%";
+            elem.innerHTML = 10 + "%";
 
 
-                var formData = new FormData();
+            var formData = new FormData();
 
-                var fileSelect = document.getElementById("fileUpload");
-                if (fileSelect.files && fileSelect.files.length == 1) {
-                    var file = fileSelect.files[0]
-                    formData.set("image", file, file.name);
-                }
-
-
-
-
-                $.ajax({
-                    xhr: function () {
-
-                        var i = 0;
-
-                        var xhr = new window.XMLHttpRequest();
-
-                        //Download progress
-                        xhr.addEventListener("progress", function (evt) {
-                            if (evt.lengthComputable) {
-                                var percentComplete = evt.loaded / evt.total;
-                                //Do something with download progress
-                                console.log(percentComplete);
-
-                                if (i == 0) {
-                                    i = 1;
-                                    var elem = document.getElementById("bar");
-                                    var width = percentComplete;
-                                    var id = setInterval(frame, 10);
-                                    function frame() {
-                                        if (width >= 100) {
-                                            clearInterval(id);
-                                            i = 0;
-                                            var prograss = document.getElementById("prograss");
-                                            prograss.style.display = 'none';
-                                            console.log("asdf");
-                                            var element = document.getElementById("container");
-                                            element.style.display = 'inline';
+            var fileSelect = document.getElementById("fileUpload");
+            if (fileSelect.files && fileSelect.files.length == 1) {
+                var file = fileSelect.files[0]
+                formData.set("image", file, file.name);
+            }
 
 
 
-                                        } else {
-                                            width++;
 
-                                            elem.style.width = width + "%";
-                                            elem.innerHTML = width + "%";
-                                        }
+            $.ajax({
+                xhr: function () {
+
+                    var i = 0;
+
+                    var xhr = new window.XMLHttpRequest();
+
+                    //Download progress
+                    xhr.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            //Do something with download progress
+                            console.log(percentComplete);
+
+                            if (i == 0) {
+                                i = 1;
+                                var elem = document.getElementById("bar");
+                                var width = percentComplete;
+                                var id = setInterval(frame, 10);
+                                function frame() {
+                                    if (width >= 100) {
+                                        clearInterval(id);
+                                        i = 0;
+                                        var prograss = document.getElementById("prograss");
+                                        prograss.style.display = 'none';
+                                        console.log("asdf");
+                                        var element = document.getElementById("container");
+                                        element.style.display = 'inline';
+
+
+
+                                    } else {
+                                        width++;
+
+                                        elem.style.width = width + "%";
+                                        elem.innerHTML = width + "%";
                                     }
                                 }
-
-
                             }
-                        }, false);
-                        return xhr;
-                    },
-                    type: 'POST', 
-                    url: '/Home/Addmood',
-                    data: formData,
-
-                    processData: false,
-                    contentType: false,
-                    success: function (data) {
-                        var str = data.toString(); 
-                        document.getElementById("warning").innerHTML = str;
 
 
-                    },
-                    error: function (data) {
-                        console.log(data);
-                        var str = data.responseJSON.toString();
-                        document.getElementById("warning").innerHTML = str;
-                    }
-                     
+                        }
+                    }, false);
+                    return xhr;
+                },
+                type: 'POST',
+                url: '/Home/Addmood',
+                data: formData,
+
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    var str = data.toString();
+                    document.getElementById("warning").innerHTML = str;
 
 
-                });
-                 
-
-            };
-
-
-            function readURL(input) {
-                if (input.files && input.files[0]) {
-                    var reader = new FileReader();
-
-                    reader.onload = function (e) {
-                        $('#image')
-                            .attr('src', e.target.result)
-                            .width(150)
-                            .height(200);
-                    };
-
-                    reader.readAsDataURL(input.files[0]);
+                },
+                error: function (data) {
+                    console.log(data);
+                    var str = data.responseJSON.toString();
+                    document.getElementById("warning").innerHTML = str;
                 }
+
+
+
+            });
+
+
+        };
+
+
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#image')
+                        .attr('src', e.target.result)
+                        .width(150)
+                        .height(200);
+                };
+
+                reader.readAsDataURL(input.files[0]);
             }
-    </script> 
+        }
+    </script>
 </body>
 
 

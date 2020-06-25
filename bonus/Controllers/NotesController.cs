@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using bonus.Models;
+using DeepAI;
 using Firebase.Database;
 using Firebase.Database.Query;
+using Newtonsoft.Json.Linq;
 
 namespace bonus.Controllers
 {
@@ -19,7 +22,7 @@ namespace bonus.Controllers
 
         // POST: Notes/Create
         [HttpPost]
-        public async System.Threading.Tasks.Task<ActionResult> Addnotes(   )
+        public async System.Threading.Tasks.Task<ActionResult> Addnotes()
         {
 
             var firebaseClient = new FirebaseClient("https://fir-notes-df65c.firebaseio.com/");
@@ -28,16 +31,23 @@ namespace bonus.Controllers
             {
                 string title = Request.Form["title"];
                 string name = Request.Form["note"];
+                var file = Request.Files["image"];
+
+
+                NotesModel model = new NotesModel();
+                model.Title = title;
+                model.timestamp = Convert.ToString(DateTime.Now);
+                model.Note = name;
+
 
 
                 var result = await firebaseClient
-                    .Child("Notes/")
-                    .Child(title)
-                    .PostAsync(name);
+                    .Child("Notes")
+                    .PostAsync(model);
 
                 return View();
             }
-            catch
+            catch (Exception ex)
             {
                 return View();
             }
