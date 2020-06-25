@@ -62,6 +62,7 @@ namespace Task6_ANDRE.Controllers
                 model.customerName = Convert.ToString(charge.Schedule);
                 model.PriceId = string.Format("{0:#.00}", Convert.ToDecimal(charge.Plan.Amount) / 100);
 
+ 
                 return View("OrderStatus", model);
             }
             catch

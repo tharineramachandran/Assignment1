@@ -13,6 +13,7 @@ namespace Task4_api
 
             // Web API routes
             config.MapHttpAttributeRoutes();
+            config.Filters.Add(new RequireHttpsAttribute());
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",

@@ -170,6 +170,7 @@
     <Compile Include="Models\Talent.cs" />
     <Compile Include="Models\TalentRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RequireHttpsAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />

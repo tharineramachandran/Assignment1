@@ -14,13 +14,15 @@ namespace task4t.Controllers
     public class TalentsController : ApiController
     {
         static readonly TalentRepository repository = new TalentRepository();
+
+        [RequireHttps]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
         [Route("api/talents")]
         public IEnumerable<Talent> GetAllTalents()
         {
             return repository.GetAll();
         }
-
+        [RequireHttps]
         [Route("api/talents/{id:int}")]
         public Talent GetTalent(int id)
         {

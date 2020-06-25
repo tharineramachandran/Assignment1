@@ -11,8 +11,30 @@ namespace Task6_ANDRE.Controllers
     public class BillingController : Controller
     {
         // GET: Billing/Create
-        public ActionResult ManageBilling()
+        public ActionResult Test()
         {
+            StripeConfiguration.ApiKey = "sk_test_51GtwelDUISIWU8NfIfToFjnvtQ3h4paJJ8JtyyXoivVWYrBZJlFqT3hQolgzBJcLe2VeoiugMfgx3LmZuKeNCrkh004UHd1BPs";
+             
+            var options = new SubscriptionListOptions
+            {
+                Limit = 100,
+            };
+            var service = new SubscriptionService();
+            StripeList<Subscription> subscriptions = service.List(
+              options
+            );
+
+
+            foreach (var okok in subscriptions) {
+
+
+                var service1 = new CustomerService();
+             var sdf =   service1.Get(okok.CustomerId);
+
+            } 
+
+
+
             return View();
         }
 
@@ -31,6 +53,7 @@ namespace Task6_ANDRE.Controllers
                 var service = new SessionService();
                 service.Create(options);
 
+            
                 return Redirect(options.ReturnUrl);
             }
             catch
