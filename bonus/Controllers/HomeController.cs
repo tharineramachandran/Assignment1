@@ -1,6 +1,4 @@
-﻿using Firebase.Database;
-using Firebase.Database.Query;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -12,11 +10,55 @@ using Newtonsoft.Json.Linq;
 using System.Threading;
 using System.Drawing;
 using System.Windows.Forms;
+using bonus.Models;
+using FireSharp.Interfaces;
+using FireSharp;
+using FireSharp.Response;
+using System.Threading.Tasks;
+using FireSharp.Config;
 
 namespace bonus.Controllers
 {
     public class HomeController : Controller
-    {
+    {      
+        IFirebaseConfig config = new FirebaseConfig
+        {
+            AuthSecret = "WlzsaHKFjCMdBFa1lEvOr36PR2oFvEZDEPFPCJkG",
+            BasePath = "https://refundcsc.firebaseio.com/"
+        };
+
+        IFirebaseClient client;
+
+        // GET: RefundController/Create
+        public async Task<ActionResult> RefundTable()
+        {
+          String   BasePath = "https://refundcsc.firebaseio.com/";
+
+            client = new Firebase.Database.FirebaseClient(BasePath);
+
+            FirebaseResponse response = await client.GetAsync("Subscription/");
+            JObject jsonobject = JObject.Parse(response.Body);
+            List<Models.MoodModel> parsedFields = new List<Models.MoodModel>();
+
+            foreach (var objectrefund in jsonobject)
+            {
+
+
+                var objectp = objectrefund.Value;
+                String customerid = (string)objectp["customerName"];
+                String price = (string)objectp["PriceId"];
+                Models.MoodModel refund = new Models.MoodModel();
+                refund.Mood = customerid;
+                refund.Timestamp = price;
+
+                parsedFields.Add(refund);
+
+            }
+
+
+            return Json(parsedFields);
+        }
+
         public ActionResult Index()
         {
             ViewBag.Title = "Home Page";
@@ -29,58 +71,12 @@ namespace bonus.Controllers
 
             return View();
         }
-        public async System.Threading.Tasks.Task<ActionResult> Addnotes()
+
+        public async System.Threading.Tasks.Task<ActionResult> Addmood()
         {
-
-            var firebaseClient = new FirebaseClient("https://fir-notes-df65c.firebaseio.com/");
-
             try
             {
-                string title = Request.Form["title"];
-                string name = Request.Form["note"];
-                var  file = Request.Files["image"];
-                DeepAI_API api = new DeepAI_API(apiKey: "7cc97bee-3a97-44bd-bb9c-a5cad72bc4df" );
-
-                StandardApiResponse resp = api.callStandardApi("facial-expression-recognition", new
-                {
-                    image = name,
-                });
-                Console.Write(api.objectAsJsonString(resp));
-
- 
-
-                DeepAI_API apei = new DeepAI_API(apiKey: "7cc97bee-3a97-44bd-bb9c-a5cad72bc4df");
-                string path = Path.Combine(Server.MapPath("~/"),
-                                       Path.GetFileName(file.FileName));
-                file.SaveAs(path); 
-                StandardApiResponse rty = apei.callStandardApi("facial-expression-recognition", new
-                {
-                    image =  System.IO.File.OpenRead(path),
-            });
-                Console.Write(apei.objectAsJsonString(rty));
-
-
-
-
-                var result = await firebaseClient
-                    .Child("Notes")
-                    .Child(title)
-                    .PostAsync(name);
-
-                return Json ("asfafd");
-            }
-            catch (Exception ex)
-            {
-                return Json(ex);
-            }
-        }
-
-        public ActionResult Addmood()
-        {
-
-
-            try
-            {
+                var firebaseClient = new FirebaseClient("https://fir-notes-df65c.firebaseio.com/");
                 var file = Request.Files["image"];
                 var timestamp = DateTime.Now.ToString("DD/MM/YY");
                 if (file != null)
@@ -118,13 +114,7 @@ namespace bonus.Controllers
                                 bestmood = emotion;
                             }
 
-
-
-
-
-
                         }
-
 
                         Dispose();
 
@@ -132,23 +122,28 @@ namespace bonus.Controllers
                         /// Add Firebase that uploads the results  bestmood  n timestamp   
                         /// 
 
+                        MoodModel model = new MoodModel();
+                        model.Timestamp = Convert.ToString(DateTime.Now);
+                        model.Mood = bestmood;
 
 
 
-
-
-
+                        var result = await firebaseClient
+                            .Child("Mood")
+                            .PostAsync(model);
 
                         Response.StatusCode = 200;
                         return Json("Successful");
-                    }else
+                    }
+                    else
                     {
                         Response.StatusCode = 400;
                         return Json("Could not track your emotion from the image, Try uploading a different image ");
 
                     }
                 }
-                else {
+                else
+                {
                     Response.StatusCode = 400;
                     return Json("Add an image");
 
