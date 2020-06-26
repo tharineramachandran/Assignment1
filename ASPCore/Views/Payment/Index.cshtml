@@ -23,7 +23,7 @@
                 tr = $('<tr/>');
                  tr.append("<td>" + result[i].id + "</td >");
                 tr.append("<td>" + result[i].amount + "</td>");
-                tr.append('<td><button class="delete" data-key="' + result[i].id + '">Delete</button></td>');
+                tr.append('<td><input type="submit" data-key="' + result[i].id + '" value="Delete"></input></td>');
                 $('table').append(tr);
             }
 
@@ -45,17 +45,19 @@
     <div class="row">
         <h2>Refund</h2>
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Customer ID</th>
-                    <th>Refund</th>
-                    <th> </th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+        <form action="/Payment/Refund/" method="post">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Customer ID</th>
+                        <th>Refund</th>
+                        <th> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </form>
     </div>
 
 

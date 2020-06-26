@@ -17,8 +17,7 @@ namespace ASPCore.Controllers
         /// Get Payment intent for refund table at payment 
         public async Task<ActionResult> Get()
         {
-
-            String CustomerID = Request.Form["CustomerID"];
+            String CustomerID = "cus_HWikKDFneftZ0w";
             StripeConfiguration.ApiKey = "sk_test_51GtwelDUISIWU8NfIfToFjnvtQ3h4paJJ8JtyyXoivVWYrBZJlFqT3hQolgzBJcLe2VeoiugMfgx3LmZuKeNCrkh004UHd1BPs";
 
             var options = new PaymentIntentListOptions
@@ -39,7 +38,7 @@ namespace ASPCore.Controllers
         // refund pass the payment ID from the get and refund it 
         public async Task<ActionResult> Refund()
         {
-            String paymentID = Request.Form["paymentID"];
+            String paymentID = "pm_1EUn5VJnvmXwwenzTDs9xSu5";
             String amountstr = Request.Form["amount"];
             long amount = (long)Convert.ToDouble(amountstr);
 
@@ -76,7 +75,7 @@ namespace ASPCore.Controllers
         {
             try
             {
-                String subscriptionId = Request.Form["subscriptionId"];
+                String subscriptionId = "sub_HTGxyc0FOBFSiP";
                 String behaviour = Request.Form["behaviour"];
 
           // Three values of mark_uncollectible  ,  keep_as_draft   , void
