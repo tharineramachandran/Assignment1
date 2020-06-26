@@ -1,8 +1,10 @@
 ﻿
 
+@{ ViewBag.Title = "AddNotes"; }
+
 <h2>Add Notes</h2>
 
-<form method="POST" action="/Notes/Addnotes">
+<form method="POST" action="/Notes/AddNotes/">
     <div class="form-group">
         <label for="title">Title</label>
         <input type="text" name="title" class="form-control" id="title" placeholder="Title">
@@ -11,3 +13,45 @@
     </div>
     <button type="submit">Add Note</button>
 </form>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Mood</th>
+            <th>Timestamp</th>
+            <th> </th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+<script>function getmood() {
+        $.ajax({
+            url: '/Notes/GetNotes',
+            type: 'GET',
+
+            success: function (result) {
+
+
+                for (var i = 0; i < result.length; i++) {
+                    tr = $('<tr/>');
+                    tr.append("<td>" + result[i].Title + "</td>");
+
+                    tr.append("<td>" + result[i].Note + "</td>");
+
+                    tr.append("<td>" + result[i].timestamp + "</td>");
+
+                    $('table').append(tr);
+                }
+
+                console.log(result);
+            }
+        })
+    }
+
+    getmood();</script>

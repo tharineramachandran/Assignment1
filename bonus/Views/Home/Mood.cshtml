@@ -5,27 +5,7 @@
 
 <h2>Mood</h2>
 
-<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-<script>
-    $.ajax({
-        url: 'Addmood',
-        type: 'GET',
-
-        success: function (result) {
-
-            console.log(result);
-            for (var i = 0; i < result.length; i++) {
-                tr = $('<tr/>');
-                tr.append("<td>" + result[i].mood + "</td>");
-                tr.append("<td>" + result[i].timestamp + "</td>");
-                tr.append("<input type=" + '"submit" ' + "value=" + '"Delete"' + ">");
-                $('table').append(tr);
-            }
-
-            console.log(result);
-        }
-    })
-</script>
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script> 
 
 <!DOCTYPE html>
 <html>
@@ -92,7 +72,7 @@
         <thead>
             <tr>
                 <th>Mood</th>
-                <th>Timestamp</th>
+                 <th>Timestamp</th>
                 <th> </th>
             </tr>
         </thead>
@@ -196,7 +176,7 @@
                     return xhr;
                 },
                 type: 'POST',
-                url: '/Home/Addmood',
+                url: '/Mood/add',
                 data: formData,
 
                 processData: false,
@@ -204,7 +184,7 @@
                 success: function (data) {
                     var str = data.toString();
                     document.getElementById("warning").innerHTML = str;
-
+                    getmood();
 
                 },
                 error: function (data) {
@@ -235,6 +215,32 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
+  
+
+        function getmood() {
+            $.ajax({
+                url: '/Mood/get',
+                type: 'GET',
+
+                success: function (result) {
+
+
+                    for (var i = 0; i < result.length; i++) {
+                        tr = $('<tr/>');
+                        tr.append("<td>" + result[i].Mood + "</td>");
+                        tr.append("<td>" + result[i].Timestamp + "</td>");
+                       
+ 
+                        $('table').append(tr);
+                    }
+
+                 }
+            })
+        }
+
+        getmood();
+         
+
     </script>
 </body>
 

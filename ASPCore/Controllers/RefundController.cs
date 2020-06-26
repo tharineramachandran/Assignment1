@@ -59,7 +59,18 @@ namespace ASPCore.Controllers
             return View();
         }
 
+
+        public ActionResult Refundpayment()
+        {
+            return View();
+        }
+
+
+
+
+
         // POST: RefundController/Create
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

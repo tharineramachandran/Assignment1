@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using bonus.Models;
@@ -52,5 +53,31 @@ namespace bonus.Controllers
                 return View();
             }
         }
+         
+
+             [HttpGet]
+        public async Task<ActionResult> GetNotes()
+        {
+            var firebaseClient = new FirebaseClient("https://fir-notes-df65c.firebaseio.com/");
+
+
+            var items = await firebaseClient
+          .Child("Notes")
+          .OrderByKey()
+          .OnceAsync<NotesModel>();
+
+            //Do whatever you need with items such as
+            List<NotesModel> parsedFields = new List<NotesModel>();
+            foreach (var item in items)
+            {
+                parsedFields.Add(item.Object);
+            }
+
+
+            return Json(parsedFields, JsonRequestBehavior.AllowGet);
+        }
+
+
+
     }
 }
